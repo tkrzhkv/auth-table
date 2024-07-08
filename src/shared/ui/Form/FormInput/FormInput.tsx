@@ -25,7 +25,7 @@ export const FormInput = <
 >(
   props: InputFormProps<TFieldValues, TName>,
 ) => {
-  const { control, name, label, type = "text", placeholder } = props;
+  const { control, name, placeholder } = props;
 
   const { field } = useController({
     name,
@@ -34,9 +34,8 @@ export const FormInput = <
 
   return (
     <input
-      className="w-[200px] h-[60px] border border-blue-900 rounded-md"
+      className="pl-4 w-full h-[40px] border border-gray-300 rounded-md focus:border-blue-500 outline-0"
       {...field}
-      type={type}
       placeholder={placeholder}
     />
   );

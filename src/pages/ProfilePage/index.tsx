@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import { UserCard } from "@/shared/ui/UserCard";
 import { Spinner } from "@material-tailwind/react";
 import { ProfileTable } from "@/features/profile-table/ui/ProfileTable";
+import { FormProvider } from "react-hook-form";
+import { useTableService } from "@/features/profile-table/model/form-table.service.ts";
 
 export const ProfilePage = () => {
   const router = useRouter();
@@ -31,15 +33,24 @@ export const ProfilePage = () => {
 
   const { name, email } = currentUser || {};
 
+  const { methods } = useTableService();
+
   return (
     <div className="w-full flex justify-center">
       {currentUser ? (
-        <div className="w-full px-20">
+        <div className="w-full px-20 items-center flex flex-col justify-center">
           <div className="flex items-center justify-between w-full max-w-screen-lg p-24">
             <UserCard name={name ?? ""} email={email ?? ""} />
-            <Button onClick={handleLogout} title="Sign out" color="#DC5D45" />
+            <Button
+              type="button"
+              onClick={handleLogout}
+              title="Sign out"
+              color="#DC5D45"
+            />
           </div>
-          <ProfileTable />
+          <FormProvider {...methods}>
+            <ProfileTable />
+          </FormProvider>
         </div>
       ) : (
         <div className="w-full h-screen flex justify-center items-center">
