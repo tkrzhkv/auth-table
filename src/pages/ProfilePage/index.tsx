@@ -1,34 +1,51 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/shared/ui/Button/Button.tsx";
-import { AvatarWithText } from "@/shared/ui/Avatar/Avatar.tsx";
+import { useAuthService } from "@/features/auth/model/auth.service.ts";
+import { useRecoilState } from "recoil";
+import { userStateAtom } from "@/entities/user/model/auth-state.ts";
+import { useEffect } from "react";
+import { UserCard } from "@/shared/ui/UserCard";
+import { Spinner } from "@material-tailwind/react";
+import { ProfileTable } from "@/features/profile-table/ui/ProfileTable";
 
 export const ProfilePage = () => {
   const router = useRouter();
-  const { logout, user } = useAuth0();
+  const { user, logoutUser } = useAuthService();
+  const [currentUser, setCurrentUser] = useRecoilState(userStateAtom);
 
-  const { name, email, picture } = user || {};
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, [user, setCurrentUser]);
+
+  const handleLogout = async () => {
+    logoutUser().subscribe({
+      next: async () => {
+        await setCurrentUser(null);
+        await router.invalidate();
+      },
+      error: (err) => console.error("Logout failed:", err),
+    });
+  };
+
+  const { name, email } = currentUser || {};
 
   return (
     <div className="w-full flex justify-center">
-      <div className="flex items-center justify-between w-full max-w-screen-lg p-24">
-        <AvatarWithText
-          name={name ?? ""}
-          email={email ?? ""}
-          imageUrl={picture ?? ""}
-        />
-
-        <div className="">
-          <Button
-            onClick={async () => {
-              await logout();
-              router.invalidate();
-            }}
-            title="Sign out"
-            bg_color="red"
-          />
+      {currentUser ? (
+        <div className="w-full px-20">
+          <div className="flex items-center justify-between w-full max-w-screen-lg p-24">
+            <UserCard name={name ?? ""} email={email ?? ""} />
+            <Button onClick={handleLogout} title="Sign out" color="#DC5D45" />
+          </div>
+          <ProfileTable />
         </div>
-      </div>
+      ) : (
+        <div className="w-full h-screen flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 };

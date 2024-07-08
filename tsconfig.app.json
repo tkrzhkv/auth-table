@@ -28,5 +28,5 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src", "i18n.ts"]
+  "include": ["src"]
 }
